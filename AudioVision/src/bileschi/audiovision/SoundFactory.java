@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 
 //TODO(mlbileschi): allow for amount of squareness/sineness
+//TODO(mlbileschi): make sampling duration something small then replicate it.
 
 public class SoundFactory {
 
@@ -27,9 +28,23 @@ public class SoundFactory {
   }
 
   public static List<Double> makeWave(WaveType waveType, int duration,
-      double frequency, double leftPercentVolume) {
+      double frequency, double leftPercentVolume, double overallVolume) {
     return toWeightedStereo(
-        waveType.makeWave(SAMPLE_RATE, duration, frequency), leftPercentVolume);
+        waveType.makeWave(SAMPLE_RATE, duration, frequency), leftPercentVolume,
+        overallVolume);
+  }
+
+  public static List<Double> squareSineMakeWave(WaveType waveType,
+      int duration, double frequency, double leftPercentVolume) {
+    List<Double> sine = makeWave(WaveType.SINE, duration, frequency,
+        leftPercentVolume, 1 - leftWeightToSquareness(leftPercentVolume));
+    List<Double> square = makeWave(WaveType.SQUARE, duration, frequency,
+        leftPercentVolume, leftWeightToSquareness(leftPercentVolume));
+    return addLists(sine, square);
+  }
+
+  private static double leftWeightToSquareness(double leftWeight) {
+    return .5 * Math.sin(Math.PI * (leftWeight - .5)) + .5;
   }
 
   public static List<Double> addLists(List<Double>... listsToAdd) {
@@ -65,29 +80,21 @@ public class SoundFactory {
     return toReturn;
   }
 
-  /*
-   * public static List<Double> interpolateLeftRight(List<Double> left,
-   * List<Double> right) { List<Double> toReturn = new ArrayList<Double>(); if
-   * (left.size() != right.size()) { throw new UnsupportedOperationException(
-   * "Cannot interpolate two lists of different length"); } for (int i = 0; i <
-   * left.size(); i++) { toReturn.add(left.get(i)); toReturn.add(right.get(i));
-   * } return toReturn; }
-   */
-
   /**
    * Right weight is 1-left weight.
    */
   public static List<Double> toWeightedStereo(List<Double> sample,
-      double leftPercentVolume) {
-    if (leftPercentVolume < 0 || leftPercentVolume > 1) {
+      double leftPercentVolume, double overallVolume) {
+    if (leftPercentVolume < 0 || leftPercentVolume > 1 || overallVolume < 0
+        || overallVolume > 1) {
       throw new UnsupportedOperationException(
           "Cannot weight a sample left-right with "
               + "that weight. Weights must be between 0 and 1, inclusive.");
     }
     List<Double> toReturn = new ArrayList<Double>(2 * sample.size());
     for (double d : sample) {
-      toReturn.add(d * leftPercentVolume);
-      toReturn.add(d * (1 - leftPercentVolume));
+      toReturn.add(d * leftPercentVolume * overallVolume);
+      toReturn.add(d * (1 - leftPercentVolume) * overallVolume);
     }
     return toReturn;
   }
