@@ -1,0 +1,39 @@
+package bileschi.audiovision;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public enum WaveType {
+  SQUARE {
+    public List<Double> makeWave(int sampleRate, int duration, double freqOfTone) {
+      List<Double> sample = new ArrayList<Double>();
+      int numSamples = duration * sampleRate;
+      // fill out the array
+      for (int i = 0; i < numSamples; i++) {
+        double toAdd;
+        if (Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)) > 0) {
+          toAdd = 1.0;
+        } else {
+          toAdd = -1.0;
+        }
+        sample.add(toAdd);
+      }
+      return sample;
+    }
+  },
+
+  SINE {
+    public List<Double> makeWave(int sampleRate, int duration, double freqOfTone) {
+      List<Double> sample = new ArrayList<Double>();
+      int numSamples = duration * sampleRate;
+      // fill out the array
+      for (int i = 0; i < numSamples; i++) {
+        sample.add(Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)));
+      }
+      return sample;
+    }
+  };
+
+  public abstract List<Double> makeWave(int sampleRate, int duration,
+      double freqOfTone);
+}

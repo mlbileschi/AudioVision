@@ -1,0 +1,15 @@
+package bileschi.audiovision;
+
+import android.graphics.Bitmap;
+
+public class ImageAudioConverter {
+
+  public static byte[] imageToSound(Bitmap bitmap) {
+    List<? extends List<Double>> samples = new ArrayList<? extends List<Double>>();
+    for (int i = 0; i < bitmap.getWidth(); i++) {
+      for (int j = 0; j < bitmap.getHeight(); j++) {
+        
+      }
+    }
+  }
+}

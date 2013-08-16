@@ -1,0 +1,16 @@
+package bileschi.audiovision;
+
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.widget.ImageView;
+
+public class ImageFactory {
+
+  public static boolean[][] createBinaryImage(Bitmap bm) {
+    Bitmap b = Bitmap.createBitmap(100, 100, Config.RGB_565);
+    b.setPixel(0, 0, 0);
+    
+    ImageView imageView = (ImageView) findViewById(R.id.image);
+    return null;
+  }
+}

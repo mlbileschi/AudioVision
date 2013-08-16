@@ -1,0 +1,27 @@
+!SESSION 2013-08-15 16:10:31.005 -----------------------------------------------
+eclipse.buildId=I20110613-1736
+java.version=1.6.0_27
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -data /home/max/eclipse/audio-vision/git-workspace/AudioVision/AudioVision -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2013-08-15 16:11:17.749
+!MESSAGE Invalid preference page path: XML Syntax
+!SESSION 2013-08-15 16:11:27.054 -----------------------------------------------
+eclipse.buildId=I20110613-1736
+java.version=1.6.0_27
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2013-08-15 16:11:47.449
+!MESSAGE Invalid preference page path: XML Syntax
+!SESSION 2013-08-15 16:11:48.464 -----------------------------------------------
+eclipse.buildId=I20110613-1736
+java.version=1.6.0_27
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -data /home/max/eclipse/audio-vision/git-workspace/AudioVision/AudioVision -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2013-08-15 16:12:38.499
+!MESSAGE Invalid preference page path: XML Syntax

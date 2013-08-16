@@ -1,0 +1,92 @@
+package bileschi.audiovision;
+
+// originally from http://marblemice.blogspot.com/2010/04/generate-and-play-tone-in-android.html
+// and modified by Steve Pomeroy <steve@staticfree.info> and mlbileschi@gmail.com
+
+import static bileschi.audiovision.SoundFactory.addLists;
+import static bileschi.audiovision.SoundFactory.listToByteArr;
+import static bileschi.audiovision.SoundFactory.toWeightedStereo;
+
+import java.util.List;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+
+public class MainActivity extends Activity {
+
+  private static final int SAMPLE_RATE = 8000;
+
+  Handler handler = new Handler();
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    ImageFactory.readFile(getResources());
+    // Use a new tread as this can take a while
+    final Thread thread = new Thread(new Runnable() {
+      public void run() {
+        List<Double> a = WaveType.SINE.makeWave(SAMPLE_RATE, 3, 110);
+        List<Double> e = WaveType.SINE.makeWave(SAMPLE_RATE, 3, 659.26);
+        List<Double> cSharp = WaveType.SQUARE.makeWave(SAMPLE_RATE, 3, 554.36);
+        final byte[] soundToPlay = listToByteArr(addLists(
+            toWeightedStereo(a, 1.0), toWeightedStereo(cSharp, 0.5),
+            toWeightedStereo(e, 0.0)));
+        handler.post(new Runnable() {
+          public void run() {
+            playSound(soundToPlay);
+          }
+        });
+      }
+    });
+    thread.start();
+  }
+
+  void playSound(byte[] soundToPlay) {
+    final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+        SAMPLE_RATE, AudioFormat.CHANNEL_OUT_STEREO,
+        AudioFormat.ENCODING_PCM_16BIT, soundToPlay.length,
+        AudioTrack.MODE_STATIC);
+    audioTrack.setStereoVolume(1.0f, 1.0f);
+    audioTrack.write(soundToPlay, 0, soundToPlay.length);
+    audioTrack.play();
+  }
+
+  class BitMapView extends View {
+    Bitmap mBitmap = null;
+
+    public BitMapView(Context context, Bitmap bm) {
+      super(context);
+      mBitmap = bm;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+      // called when view is drawn
+      Paint paint = new Paint();
+      paint.setFilterBitmap(true);
+      // The image will be scaled so it will fill the width, and the
+      // height will preserve the image’s aspect ration
+      double aspectRatio = ((double) mBitmap.getWidth()) / mBitmap.getHeight();
+      Rect dest = new Rect(0, 0, this.getWidth(),
+          (int) (this.getHeight() / aspectRatio));
+      canvas.drawBitmap(mBitmap, null, dest, paint);
+    }
+  }
+}

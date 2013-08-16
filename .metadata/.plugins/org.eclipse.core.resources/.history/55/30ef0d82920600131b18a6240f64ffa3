@@ -1,0 +1,25 @@
+package bileschi.audiovision;
+
+import static bileschi.audiovision.SoundFactory.makeWave;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.graphics.Bitmap;
+
+public class ImageAudioConverter {
+
+  public static byte[] imageToSound(Bitmap bitmap) {
+    List<? extends List<Double>> samples = new ArrayList<ArrayList<Double>>();
+    for (int i = 0; i < bitmap.getWidth(); i++) {
+      double percentOfWidth = ((double)i)/bitmap.getWidth();
+      for (int j = 0; j < bitmap.getHeight(); j++) {
+        double percentOfHeight = ((double)j)/bitmap.getHeight();
+        List<Double> newSample = SoundFactory.makeWave(WaveType.SINE, 3, percentToFreq(percentOfHeight), );
+      }
+    }
+  }
+  
+  private static double percentToFreq(double percent) {
+    
+  }
+}

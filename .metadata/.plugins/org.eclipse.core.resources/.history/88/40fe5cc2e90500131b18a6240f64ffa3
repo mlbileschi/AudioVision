@@ -1,0 +1,11 @@
+package bileschi.audiovision;
+
+import android.graphics.Bitmap;
+
+public class ImageFactory {
+
+  public static boolean[][] createBinaryImage(Bitmap bm) {
+    
+    return null;
+  }
+}

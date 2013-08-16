@@ -1,0 +1,10 @@
+package bileschi.audiovision;
+
+import android.graphics.Bitmap;
+
+public class ImageAudioConverter {
+
+  public static byte[] imageToSound(Bitmap bitmap) {
+
+  }
+}
