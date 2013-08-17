@@ -14,19 +14,24 @@ public class ImageAudioConverter {
   private static final double HALF_STEP = Math.pow(2, 1.0 / 12);
   private static final int NUM_HALF_STEPS_ALLOWED = (int) (12 * Math
       .log(SoundFactory.MAX_FREQUENCY / SoundFactory.MIN_FREQUENCY));
-  private static final int DURATION = 10;
+  private static final int DURATION = 1;
 
   public static byte[] imageToSound(Bitmap bitmap) {
 
     List<float[]> samples = new ArrayList<float[]>();
 
     for (int i = 0; i < bitmap.getWidth(); i++) {
-      float percentOfWidth = ((float) i) / bitmap.getWidth();
+      // Subtract one because top and bottom should be 0 and 100%.
+      float percentOfWidth = ((float) i) / (bitmap.getWidth() - 1);
 
       for (int j = 0; j < bitmap.getHeight(); j++) {
         if (bitmap.getPixel(i, j) == Color.BLACK) {
-          System.out.println("i, j  : " + i + ", " + j);
-          float percentOfHeight = ((float) j) / bitmap.getHeight();
+          // Subtract one because top and bottom should be 0 and 100%.
+          // Since we start at the top left of the image, we do 1- to get the
+          // percent of height.
+          float percentOfHeight = (1 - ((float) j) / (bitmap.getHeight() - 1));
+          System.out.println("i, j  : " + i + ", " + j + " freq: "
+              + percentToFreq(percentOfHeight));
           float[] newSample = SoundFactory.squareSineMakeWave(WaveType.SINE,
               DURATION, percentToFreq(percentOfHeight), percentOfWidth);
           samples.add(newSample);
@@ -35,7 +40,6 @@ public class ImageAudioConverter {
     }
     bitmap.recycle();
     return listToByteArr(addLists(samples.toArray(new float[samples.size()][])));
-
   }
 
   public static String hex(int n) {

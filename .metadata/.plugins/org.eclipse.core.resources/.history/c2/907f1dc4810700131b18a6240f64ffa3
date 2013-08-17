@@ -1,0 +1,41 @@
+package bileschi.audiovision;
+
+public enum WaveType {
+  SQUARE {
+    public float[] makeWave(int sampleRate, int duration, float freqOfTone) {
+      int numSamples = duration * sampleRate;
+      float[] sample = new float[numSamples];
+      float k = (sampleRate / freqOfTone);
+      float sineFreq = (float) (2 * Math.PI / (sampleRate / freqOfTone));
+      // fill out the array
+      float period = (sampleRate / freqOfTone);
+      float halfPeriod = period / 2;
+      for (int i = 0; i < numSamples; i++) {
+        float toAdd;
+        if (i % period < halfPeriod) {
+          toAdd = 1;
+        } else {
+          toAdd = -1;
+        }
+        sample[i] = toAdd;
+      }
+      return sample;
+    }
+  },
+
+  SINE {
+    public float[] makeWave(int sampleRate, int duration, float freqOfTone) {
+      int numSamples = duration * sampleRate;
+      float[] sample = new float[numSamples];
+      float sineFreq = (float) (2 * Math.PI / (sampleRate / freqOfTone));
+      // fill out the array
+      for (int i = 0; i < numSamples; i++) {
+        sample[i] = (float) Math.sin(i * sineFreq);
+      }
+      return sample;
+    }
+  };
+
+  public abstract float[] makeWave(int sampleRate, int duration,
+      float freqOfTone);
+}
