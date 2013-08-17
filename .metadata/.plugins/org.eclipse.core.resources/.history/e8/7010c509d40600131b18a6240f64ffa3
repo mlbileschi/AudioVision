@@ -5,16 +5,16 @@ import java.util.List;
 
 public enum WaveType {
   SQUARE {
-    public List<Float> makeWave(int sampleRate, int duration, float freqOfTone) {
-      List<Float> sample = new ArrayList<Float>();
+    public List<Double> makeWave(int sampleRate, int duration, double freqOfTone) {
+      List<Double> sample = new ArrayList<Double>();
       int numSamples = duration * sampleRate;
       // fill out the array
       for (int i = 0; i < numSamples; i++) {
-        float toAdd;
+        double toAdd;
         if (Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)) > 0) {
-          toAdd = 1;
+          toAdd = 1.0;
         } else {
-          toAdd = -1;
+          toAdd = -1.0;
         }
         sample.add(toAdd);
       }
@@ -23,18 +23,17 @@ public enum WaveType {
   },
 
   SINE {
-    public List<Float> makeWave(int sampleRate, int duration, float freqOfTone) {
-      List<Float> sample = new ArrayList<Float>();
+    public List<Double> makeWave(int sampleRate, int duration, double freqOfTone) {
+      List<Double> sample = new ArrayList<Double>();
       int numSamples = duration * sampleRate;
       // fill out the array
       for (int i = 0; i < numSamples; i++) {
-        sample.add((float) Math
-            .sin(2 * Math.PI * i / (sampleRate / freqOfTone)));
+        sample.add(Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)));
       }
       return sample;
     }
   };
 
-  public abstract List<Float> makeWave(int sampleRate, int duration,
-      float freqOfTone);
+  public abstract List<Double> makeWave(int sampleRate, int duration,
+      double freqOfTone);
 }

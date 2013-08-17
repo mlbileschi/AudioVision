@@ -12,8 +12,8 @@ import android.media.AudioTrack;
 
 public class SoundFactory {
 
-  public static final float MIN_FREQUENCY = 65;
-  public static final float MAX_FREQUENCY = 880;
+  public static final double MIN_FREQUENCY = 65;
+  public static final double MAX_FREQUENCY = 880;
   private static final int SAMPLE_RATE = 8000;
 
   public static void playSound(byte[] soundToPlay) {
@@ -27,14 +27,14 @@ public class SoundFactory {
   }
 
   public static List<Float> makeWave(WaveType waveType, int duration,
-      float frequency, float leftPercentVolume, float overallVolume) {
+      double frequency, double leftPercentVolume, double overallVolume) {
     return toWeightedStereo(
         waveType.makeWave(SAMPLE_RATE, duration, frequency), leftPercentVolume,
         overallVolume);
   }
 
   public static List<Float> squareSineMakeWave(WaveType waveType, int duration,
-      float frequency, float leftPercentVolume) {
+      double frequency, double leftPercentVolume) {
     List<Float> sine = makeWave(WaveType.SINE, duration, frequency,
         leftPercentVolume, 1 - leftWeightToSquareness(leftPercentVolume));
     List<Float> square = makeWave(WaveType.SQUARE, duration, frequency,
@@ -42,8 +42,8 @@ public class SoundFactory {
     return addLists(sine, square);
   }
 
-  private static float leftWeightToSquareness(float leftWeight) {
-    return (float) (.5 * Math.sin(Math.PI * (leftWeight - .5)) + .5);
+  private static double leftWeightToSquareness(double leftWeight) {
+    return .5 * Math.sin(Math.PI * (leftWeight - .5)) + .5;
   }
 
   public static List<Float> addLists(List<Float>... listsToAdd) {
@@ -60,7 +60,7 @@ public class SoundFactory {
     }
     List<Float> toReturn = new ArrayList<Float>();
     for (int i = 0; i < lengthOfAllLists; i++) {
-      float toPush = 0;
+      Float toPush = 0.0;
       for (int j = 0; j < listsToAdd.length; j++) {
         toPush += listsToAdd[j].get(i);
       }
@@ -70,8 +70,8 @@ public class SoundFactory {
   }
 
   private static List<Short> scaleToListOfShort(List<Float> toScale) {
-    float maxVal = Collections.max(toScale);
-    float scaleFactor = Short.MAX_VALUE / maxVal;
+    double maxVal = Collections.max(toScale);
+    double scaleFactor = Short.MAX_VALUE / maxVal;
     List<Short> toReturn = new ArrayList<Short>(toScale.size());
     for (Float d : toScale) {
       toReturn.add((short) (d * scaleFactor));
@@ -83,7 +83,7 @@ public class SoundFactory {
    * Right weight is 1-left weight.
    */
   public static List<Float> toWeightedStereo(List<Float> sample,
-      float leftPercentVolume, float overallVolume) {
+      double leftPercentVolume, double overallVolume) {
     if (leftPercentVolume < 0 || leftPercentVolume > 1 || overallVolume < 0
         || overallVolume > 1) {
       throw new UnsupportedOperationException(
@@ -91,7 +91,7 @@ public class SoundFactory {
               + "that weight. Weights must be between 0 and 1, inclusive.");
     }
     List<Float> toReturn = new ArrayList<Float>(2 * sample.size());
-    for (float d : sample) {
+    for (double d : sample) {
       toReturn.add(d * leftPercentVolume * overallVolume);
       toReturn.add(d * (1 - leftPercentVolume) * overallVolume);
     }

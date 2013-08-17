@@ -28,8 +28,7 @@ public enum WaveType {
       int numSamples = duration * sampleRate;
       // fill out the array
       for (int i = 0; i < numSamples; i++) {
-        sample.add((float) Math
-            .sin(2 * Math.PI * i / (sampleRate / freqOfTone)));
+        sample.add(Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)));
       }
       return sample;
     }

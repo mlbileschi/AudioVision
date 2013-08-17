@@ -8,12 +8,13 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 
+//TODO(mlbileschi): allow for amount of squareness/sineness
 //TODO(mlbileschi): make sampling duration something small then replicate it.
 
 public class SoundFactory {
 
-  public static final float MIN_FREQUENCY = 65;
-  public static final float MAX_FREQUENCY = 880;
+  public static final double MIN_FREQUENCY = 65;
+  public static final double MAX_FREQUENCY = 880;
   private static final int SAMPLE_RATE = 8000;
 
   public static void playSound(byte[] soundToPlay) {
@@ -26,54 +27,54 @@ public class SoundFactory {
     audioTrack.play();
   }
 
-  public static List<Float> makeWave(WaveType waveType, int duration,
-      float frequency, float leftPercentVolume, float overallVolume) {
+  public static List<Double> makeWave(WaveType waveType, int duration,
+      double frequency, double leftPercentVolume, double overallVolume) {
     return toWeightedStereo(
         waveType.makeWave(SAMPLE_RATE, duration, frequency), leftPercentVolume,
         overallVolume);
   }
 
-  public static List<Float> squareSineMakeWave(WaveType waveType, int duration,
-      float frequency, float leftPercentVolume) {
-    List<Float> sine = makeWave(WaveType.SINE, duration, frequency,
+  public static List<Double> squareSineMakeWave(WaveType waveType,
+      int duration, double frequency, double leftPercentVolume) {
+    List<Double> sine = makeWave(WaveType.SINE, duration, frequency,
         leftPercentVolume, 1 - leftWeightToSquareness(leftPercentVolume));
-    List<Float> square = makeWave(WaveType.SQUARE, duration, frequency,
+    List<Double> square = makeWave(WaveType.SQUARE, duration, frequency,
         leftPercentVolume, leftWeightToSquareness(leftPercentVolume));
     return addLists(sine, square);
   }
 
-  private static float leftWeightToSquareness(float leftWeight) {
-    return (float) (.5 * Math.sin(Math.PI * (leftWeight - .5)) + .5);
+  private static double leftWeightToSquareness(double leftWeight) {
+    return .5 * Math.sin(Math.PI * (leftWeight - .5)) + .5;
   }
 
-  public static List<Float> addLists(List<Float>... listsToAdd) {
+  public static List<Double> addLists(List<Double>... listsToAdd) {
     if (listsToAdd.length == 0) {
-      return new ArrayList<Float>();
+      return new ArrayList<Double>();
     }
     int lengthOfAllLists = listsToAdd[0].size();
-    for (List<? extends Float> innerList : listsToAdd) {
+    for (List<? extends Double> innerList : listsToAdd) {
       // Check that the lengths are all the same.
       if (innerList.size() != lengthOfAllLists) {
         throw new UnsupportedOperationException(
             "Can't add element-wise lists that are not the same size");
       }
     }
-    List<Float> toReturn = new ArrayList<Float>();
+    List<Double> toReturn = new ArrayList<Double>();
     for (int i = 0; i < lengthOfAllLists; i++) {
-      float toPush = 0;
+      Double toPush = 0.0;
       for (int j = 0; j < listsToAdd.length; j++) {
-        toPush += listsToAdd[j].get(i);
+        toPush = toPush.doubleValue() + listsToAdd[j].get(i).doubleValue();
       }
       toReturn.add(toPush);
     }
     return toReturn;
   }
 
-  private static List<Short> scaleToListOfShort(List<Float> toScale) {
-    float maxVal = Collections.max(toScale);
-    float scaleFactor = Short.MAX_VALUE / maxVal;
+  private static List<Short> scaleToListOfShort(List<Double> toScale) {
+    double maxVal = Collections.max(toScale);
+    double scaleFactor = Short.MAX_VALUE / maxVal;
     List<Short> toReturn = new ArrayList<Short>(toScale.size());
-    for (Float d : toScale) {
+    for (Double d : toScale) {
       toReturn.add((short) (d * scaleFactor));
     }
     return toReturn;
@@ -82,23 +83,23 @@ public class SoundFactory {
   /**
    * Right weight is 1-left weight.
    */
-  public static List<Float> toWeightedStereo(List<Float> sample,
-      float leftPercentVolume, float overallVolume) {
+  public static List<Double> toWeightedStereo(List<Double> sample,
+      double leftPercentVolume, double overallVolume) {
     if (leftPercentVolume < 0 || leftPercentVolume > 1 || overallVolume < 0
         || overallVolume > 1) {
       throw new UnsupportedOperationException(
           "Cannot weight a sample left-right with "
               + "that weight. Weights must be between 0 and 1, inclusive.");
     }
-    List<Float> toReturn = new ArrayList<Float>(2 * sample.size());
-    for (float d : sample) {
+    List<Double> toReturn = new ArrayList<Double>(2 * sample.size());
+    for (double d : sample) {
       toReturn.add(d * leftPercentVolume * overallVolume);
       toReturn.add(d * (1 - leftPercentVolume) * overallVolume);
     }
     return toReturn;
   }
 
-  public static byte[] listToByteArr(List<Float> sample) {
+  public static byte[] listToByteArr(List<Double> sample) {
     List<Short> sampleShorts = scaleToListOfShort(sample);
 
     byte[] toReturn = new byte[sampleShorts.size() * 2];

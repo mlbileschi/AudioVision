@@ -54,7 +54,7 @@ public class ImageAudioConverter {
     int octavesAboveMin = semitonesAboveMin / 12;
     int semitonesAboveOctave = semitonesAboveMin % 12;
 
-    return (float) (SoundFactory.MIN_FREQUENCY * Math.pow(2, octavesAboveMin) * Math
-        .pow(HALF_STEP, semitonesAboveOctave));
+    return (float) (SoundFactory.MIN_FREQUENCY * Math.pow(2, octavesAboveMin)
+        * Math.pow(HALF_STEP, semitonesAboveOctave));
   }
 }
