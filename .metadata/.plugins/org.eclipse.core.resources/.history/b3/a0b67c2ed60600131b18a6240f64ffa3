@@ -1,0 +1,51 @@
+package bileschi.audiovision;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public enum WaveType {
+  SQUARE {
+    public List<Float> makeWave(int sampleRate, int duration, float freqOfTone) {
+      List<Float> sample = new ArrayList<Float>();
+
+      // TODO(mlbileschi): Make this cast safer.
+      int numSamples = (int) SAMPLE_CONSTRUCT_DURATION * sampleRate;
+      System.out.println("This is the number of samples: " + numSamples);
+      // fill out the array
+      for (int i = 0; i < numSamples; i++) {
+        float toAdd;
+        if (Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)) > 0) {
+          toAdd = 1;
+        } else {
+          toAdd = -1;
+        }
+        sample.add(toAdd);
+      }
+      List<Float> toReturn = new ArrayList<Float>();
+      for (int i = 0; i < duration / SAMPLE_CONSTRUCT_DURATION; i++) {
+        toReturn.addAll(sample);
+        System.out.println(toReturn.size());
+      }
+
+      return toReturn;
+    }
+  },
+
+  SINE {
+    public List<Float> makeWave(int sampleRate, int duration, float freqOfTone) {
+      List<Float> sample = new ArrayList<Float>();
+      int numSamples = duration * sampleRate;
+      // fill out the array
+      for (int i = 0; i < numSamples; i++) {
+        sample.add((float) Math
+            .sin(2 * Math.PI * i / (sampleRate / freqOfTone)));
+      }
+      return sample;
+    }
+  };
+
+  public static final float SAMPLE_CONSTRUCT_DURATION = (float) .1;
+
+  public abstract List<Float> makeWave(int sampleRate, int duration,
+      float freqOfTone);
+}

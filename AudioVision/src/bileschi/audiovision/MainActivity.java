@@ -23,8 +23,10 @@ public class MainActivity extends Activity {
   protected void onResume() {
     super.onResume();
 
-    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.e);
+    Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+        R.drawable.diagline);
     final byte[] soundToPlay = ImageAudioConverter.imageToSound(bitmap);
+    System.out.println("LENGTH: " + soundToPlay.length);
     // Use a new tread as this can take a while
     final Thread thread = new Thread(new Runnable() {
       public void run() {

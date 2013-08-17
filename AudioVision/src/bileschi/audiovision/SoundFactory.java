@@ -1,9 +1,5 @@
 package bileschi.audiovision;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -26,18 +22,18 @@ public class SoundFactory {
     audioTrack.play();
   }
 
-  public static List<Float> makeWave(WaveType waveType, int duration,
+  public static float[] makeWave(WaveType waveType, int duration,
       float frequency, float leftPercentVolume, float overallVolume) {
     return toWeightedStereo(
         waveType.makeWave(SAMPLE_RATE, duration, frequency), leftPercentVolume,
         overallVolume);
   }
 
-  public static List<Float> squareSineMakeWave(WaveType waveType, int duration,
+  public static float[] squareSineMakeWave(WaveType waveType, int duration,
       float frequency, float leftPercentVolume) {
-    List<Float> sine = makeWave(WaveType.SINE, duration, frequency,
+    float[] sine = makeWave(WaveType.SINE, duration, frequency,
         leftPercentVolume, 1 - leftWeightToSquareness(leftPercentVolume));
-    List<Float> square = makeWave(WaveType.SQUARE, duration, frequency,
+    float[] square = makeWave(WaveType.SQUARE, duration, frequency,
         leftPercentVolume, leftWeightToSquareness(leftPercentVolume));
     return addLists(sine, square);
   }
@@ -46,35 +42,45 @@ public class SoundFactory {
     return (float) (.5 * Math.sin(Math.PI * (leftWeight - .5)) + .5);
   }
 
-  public static List<Float> addLists(List<Float>... listsToAdd) {
+  public static float[] addLists(float[]... listsToAdd) {
     if (listsToAdd.length == 0) {
-      return new ArrayList<Float>();
+      return new float[0];
     }
-    int lengthOfAllLists = listsToAdd[0].size();
-    for (List<? extends Float> innerList : listsToAdd) {
+    int lengthOfAllLists = listsToAdd[0].length;
+    for (float[] innerList : listsToAdd) {
       // Check that the lengths are all the same.
-      if (innerList.size() != lengthOfAllLists) {
+      if (innerList.length != lengthOfAllLists) {
         throw new UnsupportedOperationException(
             "Can't add element-wise lists that are not the same size");
       }
     }
-    List<Float> toReturn = new ArrayList<Float>();
+    float[] toReturn = new float[lengthOfAllLists];
     for (int i = 0; i < lengthOfAllLists; i++) {
       float toPush = 0;
       for (int j = 0; j < listsToAdd.length; j++) {
-        toPush += listsToAdd[j].get(i);
+        toPush += listsToAdd[j][i];
       }
-      toReturn.add(toPush);
+      toReturn[i] = toPush;
     }
     return toReturn;
   }
 
-  private static List<Short> scaleToListOfShort(List<Float> toScale) {
-    float maxVal = Collections.max(toScale);
+  private static float max(float[] arr) {
+    float max = arr[0];
+    for (int i = 0; i < arr.length; i++) {
+      if (arr[i] > max) {
+        max = arr[i];
+      }
+    }
+    return max;
+  }
+
+  private static short[] scaleToShortArr(float[] toScale) {
+    float maxVal = max(toScale);
     float scaleFactor = Short.MAX_VALUE / maxVal;
-    List<Short> toReturn = new ArrayList<Short>(toScale.size());
-    for (Float d : toScale) {
-      toReturn.add((short) (d * scaleFactor));
+    short[] toReturn = new short[toScale.length];
+    for (int i = 0; i < toScale.length; i++) {
+      toReturn[i] = (short) (toScale[i] * scaleFactor);
     }
     return toReturn;
   }
@@ -82,7 +88,7 @@ public class SoundFactory {
   /**
    * Right weight is 1-left weight.
    */
-  public static List<Float> toWeightedStereo(List<Float> sample,
+  public static float[] toWeightedStereo(float[] sample,
       float leftPercentVolume, float overallVolume) {
     if (leftPercentVolume < 0 || leftPercentVolume > 1 || overallVolume < 0
         || overallVolume > 1) {
@@ -90,18 +96,21 @@ public class SoundFactory {
           "Cannot weight a sample left-right with "
               + "that weight. Weights must be between 0 and 1, inclusive.");
     }
-    List<Float> toReturn = new ArrayList<Float>(2 * sample.size());
-    for (float d : sample) {
-      toReturn.add(d * leftPercentVolume * overallVolume);
-      toReturn.add(d * (1 - leftPercentVolume) * overallVolume);
+    float[] toReturn = new float[2 * sample.length];
+    System.out.println("makewave wavetype length : " + toReturn.length);
+    int toReturnIdx = 0;
+    for (int i = 0; i < sample.length; i++) {
+      float d = sample[i];
+      toReturn[toReturnIdx++] = d * leftPercentVolume * overallVolume;
+      toReturn[toReturnIdx++] = d * (1 - leftPercentVolume) * overallVolume;
     }
     return toReturn;
   }
 
-  public static byte[] listToByteArr(List<Float> sample) {
-    List<Short> sampleShorts = scaleToListOfShort(sample);
+  public static byte[] listToByteArr(float[] sample) {
+    short[] sampleShorts = scaleToShortArr(sample);
 
-    byte[] toReturn = new byte[sampleShorts.size() * 2];
+    byte[] toReturn = new byte[sampleShorts.length * 2];
     // convert to 16 bit pcm sound array
     // assumes the sample buffer is normalised.
     int idx = 0;
@@ -110,6 +119,7 @@ public class SoundFactory {
       toReturn[idx++] = (byte) (sVal & 0x00ff);
       toReturn[idx++] = (byte) ((sVal & 0xff00) >>> 8);
     }
+
     return toReturn;
   }
 }
